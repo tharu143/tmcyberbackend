@@ -1,12 +1,18 @@
 const { Pool } = require('@neondatabase/serverless');
 
 exports.handler = async function (event, context) {
+  // Normalize the FRONTEND_URL by removing trailing slashes
+  const frontendUrl = (process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app').replace(/\/+$/, '');
+
   const headers = {
-    'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app',
+    'Access-Control-Allow-Origin': frontendUrl,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Credentials': 'true',
   };
+
+  // Log the headers for debugging
+  console.log('CORS Headers:', headers);
 
   // Handle OPTIONS preflight request
   if (event.httpMethod === 'OPTIONS') {
