@@ -1,6 +1,6 @@
 exports.handler = async function (event, context) {
     const headers = {
-      'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:5173',
+      'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Credentials': 'true',

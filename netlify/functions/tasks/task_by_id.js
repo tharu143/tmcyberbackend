@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 exports.handler = async function (event, context) {
   const headers = {
-    'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:5173',
+    'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app',
     'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Credentials': 'true',

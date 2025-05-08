@@ -1,14 +1,14 @@
 const { Pool } = require('@neondatabase/serverless');
-const jwt = require('jsonwebtoken');
 
 exports.handler = async function (event, context) {
   const headers = {
     'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Credentials': 'true',
   };
 
+  // Handle OPTIONS preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -17,6 +17,7 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -24,30 +25,6 @@ exports.handler = async function (event, context) {
       body: JSON.stringify({ error: 'Method not allowed' }),
     };
   }
-
-  const authHeader = event.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return {
-      statusCode: 401,
-      headers,
-      body: JSON.stringify({ error: 'Unauthorized' }),
-    };
-  }
-
-  try {
-    const token = authHeader.split(' ')[1];
-    jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return {
-      statusCode: 401,
-      headers,
-      body: JSON.stringify({ error: 'Invalid token' }),
-    };
-  }
-
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
 
   let body;
   try {
@@ -60,29 +37,37 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const { query, params } = body;
-  if (!query) {
+  const { name, email, subject, message } = body;
+  if (!name || !email || !subject || !message) {
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ error: 'Query is required' }),
+      body: JSON.stringify({ error: 'All fields (name, email, subject, message) are required' }),
     };
   }
 
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+
   try {
-    const result = await pool.query(query, params || []);
+    await pool.query(
+      'INSERT INTO contacts (name, email, subject, message) VALUES ($1, $2, $3, $4)',
+      [name, email, subject, message]
+    );
     await pool.end();
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(result.rows),
+      body: JSON.stringify({ message: 'Contact message submitted successfully' }),
     };
   } catch (err) {
-    console.error('Database error:', err.message);
+    console.error('Contact submission error:', err.message);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to execute query' }),
+      body: JSON.stringify({ error: 'Internal server error' }),
     };
   }
 };
