@@ -1,6 +1,9 @@
 const { Pool } = require('@neondatabase/serverless');
 
 exports.handler = async function (event, context) {
+  // Log the raw FRONTEND_URL for debugging
+  console.log('Raw FRONTEND_URL:', process.env.FRONTEND_URL);
+
   // Normalize the FRONTEND_URL by removing trailing slashes
   const frontendUrl = (process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app').replace(/\/+$/, '');
 
