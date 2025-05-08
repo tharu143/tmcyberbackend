@@ -1,8 +1,11 @@
 const { Pool } = require('@neondatabase/serverless');
 
 exports.handler = async function (event, context) {
-  // Log the raw FRONTEND_URL for debugging
-  console.log('Raw FRONTEND_URL:', process.env.FRONTEND_URL);
+  // Log the entire event for debugging
+  console.log('Full Event:', JSON.stringify(event, null, 2));
+
+  // Log the HTTP method for debugging
+  console.log('HTTP Method:', event.httpMethod);
 
   // Normalize the FRONTEND_URL by removing trailing slashes
   const frontendUrl = (process.env.FRONTEND_URL || 'https://tmcybertech.netlify.app').replace(/\/+$/, '');
@@ -19,6 +22,7 @@ exports.handler = async function (event, context) {
 
   // Handle OPTIONS preflight request
   if (event.httpMethod === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return {
       statusCode: 200,
       headers,
@@ -28,6 +32,7 @@ exports.handler = async function (event, context) {
 
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
+    console.log('Method not allowed:', event.httpMethod);
     return {
       statusCode: 405,
       headers,
@@ -38,7 +43,9 @@ exports.handler = async function (event, context) {
   let body;
   try {
     body = JSON.parse(event.body);
+    console.log('Request Body:', body);
   } catch (err) {
+    console.log('Invalid JSON payload:', err.message);
     return {
       statusCode: 400,
       headers,
@@ -48,6 +55,7 @@ exports.handler = async function (event, context) {
 
   const { name, email, subject, message } = body;
   if (!name || !email || !subject || !message) {
+    console.log('Missing required fields:', { name, email, subject, message });
     return {
       statusCode: 400,
       headers,
@@ -66,6 +74,7 @@ exports.handler = async function (event, context) {
     );
     await pool.end();
 
+    console.log('Contact message submitted successfully');
     return {
       statusCode: 200,
       headers,
