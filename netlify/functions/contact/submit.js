@@ -21,7 +21,7 @@ exports.handler = async function (event, context) {
   console.log('CORS Headers:', headers);
 
   // Handle OPTIONS preflight request
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod.toUpperCase() === 'OPTIONS') {
     console.log('Handling OPTIONS request');
     return {
       statusCode: 200,
@@ -30,8 +30,8 @@ exports.handler = async function (event, context) {
     };
   }
 
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
+  // Only allow POST requests (case-insensitive)
+  if (event.httpMethod.toUpperCase() !== 'POST') {
     console.log('Method not allowed:', event.httpMethod);
     return {
       statusCode: 405,
