@@ -10,6 +10,7 @@ exports.handler = async function (event, context) {
     'Access-Control-Allow-Credentials': 'true',
   };
 
+  // Handle OPTIONS preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -18,6 +19,7 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // Only allow POST requests for login
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
